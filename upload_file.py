@@ -4,11 +4,11 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
-import pickle
+import pickle,sys
 
 # --- SETTINGS ---
 FILE_PATH = "jeff.txt"     # File to upload
-TOKEN_PICKLE = '/builds/gdrivebu/token.pickle'
+TOKEN_PICKLE = '/tmp/token.pickle'
 FOLDER_ID = '1oeDSh7rIYd00eS4TvkuTQoru52MpqxyB'
 
 # If modifying these scopes, delete the file token.pickle
@@ -46,7 +46,7 @@ def authenticate():
 
     return creds
 
-def upload_file():
+def upload_file(file_path):
     #creds = authenticate()
     with open(TOKEN_PICKLE, 'rb') as token:
         creds = pickle.load(token)
@@ -67,4 +67,4 @@ def upload_file():
     print(f"Uploaded file ID: {file.get('id')}")
 
 if __name__ == '__main__':
-    upload_file()
+    upload_file(sys.argv[1])
