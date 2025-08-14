@@ -7,7 +7,6 @@ from google.auth.transport.requests import Request
 import pickle,sys
 
 # --- SETTINGS ---
-FILE_PATH = "jeff.txt"     # File to upload
 TOKEN_PICKLE = '/run/secrets/token.pickle'
 FOLDER_ID = '1oeDSh7rIYd00eS4TvkuTQoru52MpqxyB'
 
@@ -53,10 +52,10 @@ def upload_file(file_path):
     service = build('drive', 'v3', credentials=creds)
 
     file_metadata = {
-        'name': os.path.basename(FILE_PATH),
+        'name': os.path.basename(file_path),
         'parents': [FOLDER_ID]
     }
-    media = MediaFileUpload(FILE_PATH, resumable=True)
+    media = MediaFileUpload(file_path, resumable=True)
 
     file = service.files().create(
         body=file_metadata,
