@@ -1,1 +1,1 @@
-docker run -d --restart unless-stopped -v /home/$USER/builds:/builds:z --name gdrivebu gdrivebu
+docker run -d --restart unless-stopped -v /home/$USER/builds:/builds:z --mount type=bind,src=/tmp/google_drive_api_client_secret.json,target=/run/secrets/google_drive_api_client_secret.json,readonly --name gdrivebu gdrivebu

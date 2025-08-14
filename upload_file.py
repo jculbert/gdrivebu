@@ -1,45 +1,70 @@
 from __future__ import print_function
 import os
-from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import pickle
 
-# Path to your service account key file
-SERVICE_ACCOUNT_FILE = 'service_account.json'
+# --- SETTINGS ---
+FILE_PATH = "jeff.txt"     # File to upload
+TOKEN_PICKLE = '/builds/gdrivebu/token.pickle'
+FOLDER_ID = '1oeDSh7rIYd00eS4TvkuTQoru52MpqxyB'
 
-# This scope allows full access to Drive
-SCOPES = ['https://www.googleapis.com/auth/drive']
+# If modifying these scopes, delete the file token.pickle
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
-def upload_file(file_path, drive_folder_id=None):
-    # Authenticate using the service account
-    creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+def authenticate():
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from google.auth.transport.requests import Request
 
+    creds = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                TOKEN, SCOPES,
+                redirect_uri='urn:ietf:wg:oauth:2.0:oob'
+            )
+
+            auth_url, _ = flow.authorization_url(prompt='consent')
+            print("Please go to this URL and authorize this app:")
+            print(auth_url)
+
+            code = input("Enter the authorization code here: ")
+
+            flow.fetch_token(code=code)
+            creds = flow.credentials
+
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    return creds
+
+def upload_file():
+    #creds = authenticate()
+    with open(TOKEN_PICKLE, 'rb') as token:
+        creds = pickle.load(token)
     service = build('drive', 'v3', credentials=creds)
 
-    # Prepare file metadata
-    file_metadata = {'name': os.path.basename(file_path)}
-    if drive_folder_id:
-        file_metadata['parents'] = [drive_folder_id]
+    file_metadata = {
+        'name': os.path.basename(FILE_PATH),
+        'parents': [FOLDER_ID]
+    }
+    media = MediaFileUpload(FILE_PATH, resumable=True)
 
-    media = MediaFileUpload(file_path, resumable=True)
-
-    # Upload the file
     file = service.files().create(
         body=file_metadata,
         media_body=media,
         fields='id'
     ).execute()
 
-    print(f"File uploaded successfully, ID: {file.get('id')}")
+    print(f"Uploaded file ID: {file.get('id')}")
 
 if __name__ == '__main__':
-    # Local file to upload
-    local_file_path = 'test.txt'
-    
-    # Optional: Google Drive folder ID
-    folder_id = None  # e.g. '1A2B3C4D5E6F'
-    
-    upload_file(local_file_path, folder_id)
-
-
+    upload_file()
