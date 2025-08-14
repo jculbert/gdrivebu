@@ -8,7 +8,7 @@ import pickle,sys
 
 # --- SETTINGS ---
 FILE_PATH = "jeff.txt"     # File to upload
-TOKEN_PICKLE = '/tmp/token.pickle'
+TOKEN_PICKLE = '/run/secrets/token.pickle'
 FOLDER_ID = '1oeDSh7rIYd00eS4TvkuTQoru52MpqxyB'
 
 # If modifying these scopes, delete the file token.pickle
