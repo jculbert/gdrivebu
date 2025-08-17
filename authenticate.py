@@ -6,7 +6,9 @@ from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+#SCOPES = ['https://www.googleapis.com/auth/drive.file']
+#SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly', 'https://www.googleapis.com/auth/drive.file']
+SCOPES = ['https://www.googleapis.com/auth/drive']
 TOKEN = '/tmp/google_drive_api_client_secret.json'
 
 def authenticate():

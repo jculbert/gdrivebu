@@ -10,8 +10,22 @@ import pickle,sys
 TOKEN_PICKLE = '/tmp/token.pickle'
 ROOT_FOLDER_ID = '1oeDSh7rIYd00eS4TvkuTQoru52MpqxyB'
 
-# If modifying these scopes, delete the file token.pickle
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+def list_subfolders(service, parent_id):
+    query = (
+        f"'{parent_id}' in parents "
+        f"and mimeType = 'application/vnd.google-apps.folder' "
+        f"and trashed = false"
+    )
+
+    results = service.files().list(
+        q=query,
+        spaces='drive',
+        fields='files(id, name)',
+        pageSize=100
+    ).execute()
+
+    for f in results.get('files', []):
+        print(f"Found subfolder: {f['name']} (ID: {f['id']})")
 
 def get_subfolder_id(service, parent_id, subfolder_name):
     """
@@ -69,4 +83,4 @@ if __name__ == '__main__':
     else:
         folder_id = ROOT_FOLDER_ID
 
-    #upload_file(service, sys.argv[1], folder_id)
+    upload_file(service, sys.argv[1], folder_id)
