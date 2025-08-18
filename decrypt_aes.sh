@@ -1,3 +1,4 @@
+#!/bin/bash
 in="$1"
 
 if [[ "$in" == *.aes ]]; then

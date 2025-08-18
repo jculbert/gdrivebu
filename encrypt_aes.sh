@@ -1,1 +1,2 @@
+#!/bin/bash
 openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -pass "pass:$(< /tmp/encp.txt)" -in $1 -out $1.aes
