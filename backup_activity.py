@@ -9,7 +9,7 @@ enc_tarfn = tarfn + ".aes"
 cmd = "tar cvzf " + tarfn +  " *"
 subprocess.run(cmd, shell=True)
 subprocess.call(["encrypt_aes.sh", tarfn])
-subprocess.call(["gdrivebu_upload_file.py", enc_tarfn, "activity"])
+subprocess.call(["gdrivebu_upload_file.sh", enc_tarfn, "activity"])
 subprocess.call(["rm", tarfn])
 
 cmd = 'find . -maxdepth 1 -type f -not -name "*.aes" -delete'
