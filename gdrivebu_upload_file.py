@@ -79,7 +79,7 @@ if __name__ == '__main__':
             print(f"Folder ID: {folder_id}")
         else:
             print(f"Sub folder {sys.argv[2]} not found")
-            exit
+            sys.exit(1)
     else:
         folder_id = ROOT_FOLDER_ID
 
