@@ -4,7 +4,7 @@ import os, subprocess
 current_dir = os.getcwd()
 cur_dir_name = os.path.basename(current_dir)
 
-tarfn = "activity_" + str(cur_dir_name) + ".tz"
+tarfn = "taxes_" + str(cur_dir_name) + ".tz"
 enc_tarfn = tarfn + ".aes"
 cmd = "tar cvzf " + tarfn +  " *"
 subprocess.run(cmd, shell=True)
