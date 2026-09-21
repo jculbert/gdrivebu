@@ -1,0 +1,10 @@
+[Unit]
+Description=Runs backup_db on a schedule
+
+[Timer]
+OnCalendar=*-*-* 02:35:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+

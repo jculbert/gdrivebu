@@ -7,11 +7,13 @@ from pathlib import Path
 from datetime import datetime
 
 # Configuration
-DUMP_PATH = '/tmp/db_' + datetime.today().strftime('%Y-%m-%d') + '.dmp'
+DUMP_PATH = '/home/jeff/Backups/db_' + datetime.today().strftime('%Y-%m-%d') + '.dmp'
 DUMP_FILE = Path(DUMP_PATH)
-HASH_FILE = Path("/var/lib/investman/database.sha256")
-SCRIPT_TO_RUN = Path("/usr/local/bin/do_something.py")
+HASH_FILE = Path("/home/jeff/Backups/database.sha256")
 
+TOKEN_PATH = '/tmp/token.pickle'
+ENCRYPTION_KEY_PATH = '/tmp/encp.txt'
+UPLOAD_SECRET_PATH = '/tmp/google_drive_api_client_secret.json'
 
 def calculate_sha256(filename):
     """Calculate the SHA-256 hash of a file."""
@@ -24,7 +26,22 @@ def calculate_sha256(filename):
     return sha256.hexdigest()
 
 
+def check_file_path(file_path):
+    """Verify that a file exists and update its timestamp."""
+    file_path = Path(file_path)
+    if not file_path.exists():
+        print(f"File does not exist: {file_path}", file=sys.stderr)
+        sys.exit(1)
+
+    subprocess.run(["touch", str(file_path)], check=True)
+
+
 def main():
+    print("Refreshing tmp files...")
+    check_file_path(TOKEN_PATH)
+    check_file_path(ENCRYPTION_KEY_PATH)
+    check_file_path(UPLOAD_SECRET_PATH)
+
     print("Dumping database...")
 
     command = [
@@ -50,6 +67,8 @@ def main():
         print(e.stderr.decode(), file=sys.stderr)
         sys.exit(1)
 
+    check_file_path(DUMP_FILE)
+
     print(f"Calculating SHA-256 of {DUMP_FILE}...")
 
     new_hash = calculate_sha256(DUMP_FILE)
@@ -71,16 +90,10 @@ def main():
         HASH_FILE.parent.mkdir(parents=True, exist_ok=True)
         HASH_FILE.write_text(new_hash + "\n")
 
-        print(f"Running {SCRIPT_TO_RUN}...")
-
         try:
-            tarfn = DUMP_PATH + '.tz'
-            subprocess.call(["tar", "czf", tarfn, DUMP_PATH])
-            subprocess.call(["encrypt_aes.sh", tarfn])
-            subprocess.call(["rm", tarfn])
-            subprocess.call(["rm", DUMP_PATH])
-
-            pass
+            subprocess.call(["encrypt_aes.sh", DUMP_PATH])
+            aespath = DUMP_PATH + ".aes"
+            subprocess.call(["gdrivebu_upload_file.sh", aespath, "database"])
 
         except subprocess.CalledProcessError as e:
             print(
@@ -92,6 +105,7 @@ def main():
     else:
         print("Database has not changed. Nothing to do.")
 
+    subprocess.call(["rm", DUMP_PATH])
 
 if __name__ == "__main__":
     main()

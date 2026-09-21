@@ -1,0 +1,6 @@
+[Unit]
+Description=Documents Backup
+
+[Service]
+Type=oneshot
+ExecStart=/home/jeff/builds/gdrivebu/backup_db2.py
